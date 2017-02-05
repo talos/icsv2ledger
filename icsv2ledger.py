@@ -97,6 +97,8 @@ DEFAULTS = dotdict({
     'debit': str(3),
     'default_expense': 'Expenses:Unknown',
     'desc': str(2),
+    'credit_account_col': str(0),
+    'flip_credit_debit': str(0),
     'encoding': 'utf-8',
     'ledger_date_format': '',
     'quiet': False,
@@ -340,6 +342,18 @@ def parse_args_and_config_file():
         help=('CSV column number matching credit amount'
               ' (default: {0})'.format(DEFAULTS.credit)))
     parser.add_argument(
+        '--credit-account-col',
+        metavar='INT',
+        type=int,
+        help=('CSV column number for credit account'
+              ' (default: {0})'.format(DEFAULTS.credit_account_col)))
+    parser.add_argument(
+        '--flip-credit-debit',
+        metavar='INT',
+        type=int,
+        help=('CSV column number to specify credit/debit should be swapped (if "credit")'
+              ' (default: {0})'.format(DEFAULTS.flip_credit_debit)))
+    parser.add_argument(
         '--csv-date-format',
         metavar='STR',
         help=('date format in CSV input file'
@@ -484,6 +498,12 @@ class Entry:
             self.effective_date = ""
 
 
+        # column level override of credit account
+        if options.credit_account_col:
+            self.credit_account = fields[options.credit_account_col - 1]
+        else:
+            self.credit_account = options.account
+
         desc = []
         for index in re.compile(',\s*').split(options.desc):
             desc.append(fields[int(index) - 1].strip())
@@ -499,7 +519,12 @@ class Entry:
         self.credit_account = options.account
         if options.src_account:
             self.credit_account = options.src_account
-        
+
+        # swap credit/debit (for example, mint has one generic column for "amount")
+        if options.flip_credit_debit:
+            if fields[options.flip_credit_debit - 1] == 'credit':
+                self.debit, self.credit = self.credit, self.debit
+
         self.currency = options.currency
         self.credit_currency = getattr(
             options, 'credit_currency', self.currency)

@@ -69,6 +69,8 @@ Options can either be used from command line or in configuration file.
     --config-file FILE, -c FILE
                           configuration file
     --credit INT          CSV column number matching credit amount
+    --credit-account-col  CSV column number to override --account and
+                          --src-account for a transaction
     --csv-date-format STR
                           date format in CSV input file
     --csv-decimal-comma   comma as decimal separator in the CSV
@@ -81,6 +83,8 @@ Options can either be used from command line or in configuration file.
     --desc STR            CSV column number matching description
     --effective-date INT  CSV column number matching effective date
     --encoding STR        text encoding of CSV input file
+    --flip-credit-debit   CSV column number if is "credit" flips the
+                          credit/debit amounts (useful for Mint output)
     --incremental         append output as transactions are processed
     --ledger-date-format STR
                           date format for ledger output file
@@ -159,6 +163,12 @@ in the CSV file is numbered 1. Default is `4`.
 
 See also documentation of `--debit` option for negating amounts.
 
+**`--credit-account-col`**
+
+is the CSV file column which contains an account to use for credit, overriding
+--account and --src-account options.  Useful for Mint, where all source
+accounts are in one file.  Default is 0 (disabled).
+
 **`--csv-date-format STR`**
 
 describes the date format in the CSV file. 
@@ -230,6 +240,13 @@ template file. See section
 is the text encoding of the CSV input file. Default is `utf-8`. The encoding
 should be specified if the CSV file contains non-ASCII characters (typically in
 the transaction description) in an encoding other than UTF-8.
+
+**`--flip-credit-debit`**
+
+is the CSV file column which if it is equal to `credit` will result in the
+credit/debit amounts being flipped.  This is useful for Mint output, which has
+one column for amount but a separate column where sign is determined by a value
+of "credit" or "debit".  Default is 0 (disabled)
 
 **`--incremental`**
 

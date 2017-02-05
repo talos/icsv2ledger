@@ -497,13 +497,6 @@ class Entry:
         else:
             self.effective_date = ""
 
-
-        # column level override of credit account
-        if options.credit_account_col:
-            self.credit_account = fields[options.credit_account_col - 1]
-        else:
-            self.credit_account = options.account
-
         desc = []
         for index in re.compile(',\s*').split(options.desc):
             desc.append(fields[int(index) - 1].strip())
@@ -519,6 +512,12 @@ class Entry:
         self.credit_account = options.account
         if options.src_account:
             self.credit_account = options.src_account
+
+        # column level override of credit account
+        if options.credit_account_col:
+            self.credit_account = fields[options.credit_account_col - 1]
+        else:
+            self.credit_account = options.account
 
         # swap credit/debit (for example, mint has one generic column for "amount")
         if options.flip_credit_debit:
